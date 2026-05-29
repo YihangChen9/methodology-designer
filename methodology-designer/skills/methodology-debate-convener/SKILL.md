@@ -19,9 +19,17 @@ Do NOT submit a methodology document until you have:
   1. Convened a debate with at least 2 (recommended 3-5) participants.
   2. Read the judge's verdict and the full transcript.
   3. Written a structured methodology that synthesises the debate outcome.
+  4. **Rendered the framework figure** (`stage4_framework_figure.png`)
+     via `load_skill("paper-framework-figure")` and embedded its
+     numbered caption in `stage4_methodology_designer.md`. The Stage 4
+     critic checks D10 (Framework Figure) as a hard gate — missing or
+     unreferenced figure = auto-REJECT.
 
 The debate is not optional. "Simple" methodology decisions are exactly
-where unexamined assumptions cause the most damage downstream.
+where unexamined assumptions cause the most damage downstream. The
+figure is not optional either — every CCF-A methodology ships with
+one, no exceptions. Treat the figure as Phase 8 of your normal flow,
+not as something to add only after a critic complaint.
 </HARD-GATE>
 
 ---
@@ -406,10 +414,51 @@ so the transcript file MUST exist by this point.
 
 ---
 
-## Phase 8: Submit and Handle Retries
+## Phase 8: Render the Framework Figure
+
+**This phase is mandatory.** The framework figure is the visual half
+of the methodology — readers (and the Stage 4 critic) expect it. Do
+not save it for "after we have results"; render it now from the
+methodology you just wrote.
 
 ```python
-submit_result(summary="Methodology v2: cluster RCT chosen over PR-level RCT and observational PSM. See stage4_methodology_designer.md. Transcript: stage4_debate_transcript.md. 4 participants, 1 round, unanimous consensus.")
+load_skill("paper-framework-figure")
+```
+
+The `paper-framework-figure` runbook walks you through:
+
+1. Synthesise a 4-section work summary
+   (`背景 / 问题和难点 / 创新点 / 具体的技术路线`) from Stages 1-3 plus
+   the final methodology you just wrote in Phase 7.
+2. Save the synthesised prompt to `paper_figure_prompt.md` (audit trail).
+3. POST to OpenRouter (`google/gemini-2.5-flash-image`) with the
+   "Generate ONE image" wrapper. **Watch for `image_tokens: 0` in the
+   response — that means the model lapsed into chat mode; retry with
+   the wrapper.**
+4. Decode the base64 response and save the PNG as
+   `stage4_framework_figure.png` in the iteration directory.
+5. Embed it in `stage4_methodology_designer.md` using a Markdown image
+   tag with a numbered caption that names every box/arrow:
+
+       ![Figure 1. <one-paragraph caption naming every box/arrow shown in the figure>](stage4_framework_figure.png)
+
+The caption must NOT use vague pronouns ("see above", "the framework")
+— each numbered Stage / component visible in the rendered PNG must be
+named in the caption sentence. CCF-A reviewers grade figure captions.
+
+### Why Phase 8 is part of the runbook, not a separate "after-step"
+
+Producers who treat figure rendering as an optional add-on consistently
+forget it on the first submit, get D10-REJECTed by the critic, and burn
+an entire LLM cycle (debate, revise, submit) before adding it on retry.
+Render the figure HERE, before `submit_result`, every time.
+
+---
+
+## Phase 9: Submit and Handle Retries
+
+```python
+submit_result(summary="Methodology v2: cluster RCT chosen over PR-level RCT and observational PSM. See stage4_methodology_designer.md. Transcript: stage4_debate_transcript.md. Figure: stage4_framework_figure.png. 4 participants, 1 round, unanimous consensus.")
 ```
 
 If the adversarial critic rejects your methodology, the rejection will name
